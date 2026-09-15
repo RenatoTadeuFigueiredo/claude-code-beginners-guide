@@ -1,5 +1,7 @@
 # Claude Code on macOS — a beginner's guide
 
+**English** · [Português](pt-br/README.md)
+
 A hands-on path from zero to productive with [Claude Code](https://code.claude.com/docs) on a Mac:
 install it, understand its permissions, configure it well, and use it on a real project.
 

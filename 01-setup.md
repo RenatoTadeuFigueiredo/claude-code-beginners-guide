@@ -1,5 +1,7 @@
 # 01 — Setup
 
+**English** · [Português](pt-br/01-setup.md)
+
 Prerequisites, install, and login. By the end you have Claude Code running.
 
 **Time:** 25 minutes, most of it waiting for downloads.

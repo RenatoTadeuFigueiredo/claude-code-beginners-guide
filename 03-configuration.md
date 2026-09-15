@@ -1,5 +1,7 @@
 # 03 — Configuration
 
+**English** · [Português](pt-br/03-configuration.md)
+
 Configuration is two different things:
 
 1. **Settings** (`settings.json`) — mechanical behaviour: permissions, model, theme.

@@ -1,5 +1,7 @@
 # 05 — Reference
 
+**English** · [Português](pt-br/05-reference.md)
+
 Look things up here. **Read the first section once, before you need it.**
 
 ---

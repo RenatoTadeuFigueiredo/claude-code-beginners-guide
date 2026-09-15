@@ -42,7 +42,7 @@ from pathlib import Path
 import re
 FENCE = chr(96) * 3          # three backticks, without quoting them literally
 bad = []
-for f in sorted(Path('.').glob('*.md')):
+for f in sorted(Path('.').rglob('*.md')):
     t = f.read_text()
     if t.count(FENCE) % 2:
         bad.append(f'{f}: unbalanced fence')
@@ -60,7 +60,7 @@ from pathlib import Path
 import re, subprocess
 FENCE = chr(96) * 3
 bad = 0
-for f in sorted(Path('.').glob('*.md')):
+for f in sorted(Path('.').rglob('*.md')):
     for m in re.finditer(FENCE + r'bash\n(.*?)' + FENCE, f.read_text(), re.S):
         code = m.group(1)
         if re.search(r'<[a-z_]+>', code):

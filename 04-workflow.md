@@ -1,5 +1,7 @@
 # 04 — Workflow, tools, and extending
 
+**English** · [Português](pt-br/04-workflow.md)
+
 Three parts: the loop you run daily, connecting external tools, and extending Claude Code once the
 basics are comfortable.
 

@@ -1,5 +1,7 @@
 # 02 — Your first session
 
+**English** · [Português](pt-br/02-first-session.md)
+
 This chapter gets you through a real session and teaches the one thing that separates pleasant
 Claude Code use from painful use: **permission modes.**
 

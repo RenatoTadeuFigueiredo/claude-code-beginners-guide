@@ -1,9 +1,9 @@
-# Claude Code no macOS — um guia para iniciantes
+# Claude Code — um guia para iniciantes
 
 **Português** · [English](../README.md)
 
-Um caminho prático do zero à produtividade com [Claude Code](https://code.claude.com/docs) no Mac:
-instalar, entender as permissões, configurar bem e usar em um projeto real.
+Um caminho prático do zero à produtividade com [Claude Code](https://code.claude.com/docs) no macOS
+e no Windows: instalar, entender as permissões, configurar bem e usar em um projeto real.
 
 Escrito para quem **já usa ferramentas de IA e já abriu um terminal**, mas não se chamaria de
 avançado em TI. Nenhum conhecimento de programação é presumido.
@@ -15,8 +15,8 @@ avançado em TI. Nenhum conhecimento de programação é presumido.
 
 ## Para quem é este guia
 
-**Sim, se você:** já usa ChatGPT/Claude/etc. · digita comandos com naturalidade · tem um Mac ·
-quer usar um agente de IA em código real sem quebrar nada.
+**Sim, se você:** já usa ChatGPT/Claude/etc. · digita comandos com naturalidade · usa macOS ou
+Windows · quer usar um agente de IA em código real sem quebrar nada.
 
 **Não, se você:** nunca abriu um terminal (leia o
 [guia de terminal](https://code.claude.com/docs/en/terminal-guide) primeiro) · procura uma
@@ -44,10 +44,25 @@ edita seus arquivos é saber como desfazer.
 
 ## A versão de 5 minutos
 
+**macOS**
+
 ```bash
 curl -fsSL https://claude.ai/install.sh | bash    # install
+```
+
+**Windows**
+
+```powershell
+irm https://claude.ai/install.ps1 | iex           # install
+```
+
+```bash
 claude --version                                  # confirm
-cd ~/Projects/my-project && claude                # start
+```
+
+```bash
+cd ~/Projects/my-project                          # start
+claude
 ```
 
 Faça login pelo navegador quando for pedido. Depois:
@@ -58,8 +73,9 @@ o que este projeto faz?
 
 Esse é o ciclo inteiro. O guia é sobre fazer isso *bem* e *com segurança*.
 
-**Requisitos:** macOS 13+ · uma conta Claude **Pro, Max, Team ou Enterprise** (o plano gratuito
-não inclui o Claude Code) · um terminal.
+**Requisitos:** macOS 13+, ou Windows 10 (1809+) / Server 2019+ em x64 ou ARM64 — 32 bits não é
+suportado · uma conta Claude **Pro, Max, Team ou Enterprise** (o plano gratuito não inclui o
+Claude Code) · um terminal.
 
 ---
 
@@ -103,6 +119,8 @@ O que muda mais rápido, se você quiser conferir: `claude --version` contra a v
 
 - Blocos `bash` são digitados no seu terminal. Blocos `text` são digitados dentro do Claude Code.
   Blocos `json` são conteúdos de arquivo que você cria.
+- Blocos rotulados **macOS** ou **Windows** valem só para aquele sistema. Blocos sem rótulo
+  funcionam nos dois — um bloco `powershell` só aparece onde o comando diverge.
 - `~` significa sua pasta home (`/Users/yourname`).
 - **Um caminho recomendado por tarefa.** Onde existem várias abordagens, o guia escolhe uma para
   você não ter que escolher entre coisas que ainda não sabe comparar.

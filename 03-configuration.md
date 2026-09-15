@@ -46,6 +46,8 @@ rules nobody follows.
 
 ### A real example
 
+*`make` does not ship with Windows by default — install it or swap in the equivalent commands.*
+
 ```markdown
 # Project: acme-api
 
@@ -99,6 +101,9 @@ after editing.
 | **Shared project** | `<project>/.claude/settings.json` | Everyone — **commit this** |
 | **Project local** | `<project>/.claude/settings.local.json` | You, this project — do not commit |
 
+On Windows the user-level path is `%USERPROFILE%\.claude\settings.json` — same layout, different
+base.
+
 If the same key appears in two files, the higher wins:
 `project local > shared project > user`.
 
@@ -149,6 +154,9 @@ machine.
 
 > Rules match the command **as written**. `git push` and `git -C /path push` are different
 > strings.
+>
+> On Windows, paths are normalised to the POSIX form before matching — `C:\Users\alice` becomes
+> `/c/Users/alice`.
 
 ### Verify and change settings
 
@@ -158,6 +166,16 @@ machine.
 
 The `Setting sources` line lists the files that actually loaded. If yours is not there, it did not
 load — usually a wrong path or invalid JSON.
+
+To validate the JSON yourself (macOS ships Python; Windows does not):
+
+```bash
+# macOS
+python3 -m json.tool ~/.claude/settings.json
+
+# Windows
+python -m json.tool "$env:USERPROFILE\.claude\settings.json"
+```
 
 ```text
 /config

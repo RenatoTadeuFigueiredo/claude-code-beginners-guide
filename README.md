@@ -1,9 +1,9 @@
-# Claude Code on macOS — a beginner's guide
+# Claude Code — a beginner's guide
 
 **English** · [Português](pt-br/README.md)
 
-A hands-on path from zero to productive with [Claude Code](https://code.claude.com/docs) on a Mac:
-install it, understand its permissions, configure it well, and use it on a real project.
+A hands-on path from zero to productive with [Claude Code](https://code.claude.com/docs) on macOS
+or Windows: install it, understand its permissions, configure it well, and use it on a real project.
 
 Written for people who **already use AI tools and have opened a terminal**, but would not call
 themselves advanced in IT. No programming knowledge assumed.
@@ -15,8 +15,8 @@ themselves advanced in IT. No programming knowledge assumed.
 
 ## Who this is for
 
-**Yes, if you:** use ChatGPT/Claude/etc. already · are comfortable typing commands · have a Mac ·
-want to use an AI agent on real code without breaking things.
+**Yes, if you:** use ChatGPT/Claude/etc. already · are comfortable typing commands · use macOS or
+Windows · want to use an AI agent on real code without breaking things.
 
 **No, if you:** have never opened a terminal (read the
 [terminal guide](https://code.claude.com/docs/en/terminal-guide) first) · are looking for an API
@@ -44,10 +44,25 @@ your files is knowing how to undo it.
 
 ## The 5-minute version
 
+**macOS**
+
 ```bash
 curl -fsSL https://claude.ai/install.sh | bash    # install
+```
+
+**Windows**
+
+```powershell
+irm https://claude.ai/install.ps1 | iex           # install
+```
+
+```bash
 claude --version                                  # confirm
-cd ~/Projects/my-project && claude                # start
+```
+
+```bash
+cd ~/Projects/my-project                          # start
+claude
 ```
 
 Log in through the browser when asked. Then:
@@ -58,8 +73,9 @@ what does this project do?
 
 That is the whole loop. The guide is about doing it *well* and *safely*.
 
-**Requirements:** macOS 13+ · a Claude **Pro, Max, Team, or Enterprise** account (the free plan
-does not include Claude Code) · a terminal.
+**Requirements:** macOS 13+, or Windows 10 (1809+) / Server 2019+ on x64 or ARM64 — 32-bit is not
+supported · a Claude **Pro, Max, Team, or Enterprise** account (the free plan does not include
+Claude Code) · a terminal.
 
 ---
 
@@ -101,6 +117,8 @@ What drifts fastest, if you want to spot-check: `claude --version` against the g
 
 - `bash` blocks are typed in your terminal. `text` blocks are typed inside Claude Code. `json`
   blocks are file contents you create.
+- Blocks labeled **macOS** or **Windows** are for that system only. Blocks without a label work on
+  both — a `powershell` block appears only where the command differs.
 - `~` means your home folder (`/Users/yourname`).
 - **One recommended way per task.** Where several approaches exist, the guide picks one so you are
   not choosing between things you cannot yet compare.

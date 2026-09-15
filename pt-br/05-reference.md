@@ -15,23 +15,35 @@ Quase nada do que você faz com o Claude Code é permanente.
 | Claude fez uma bagunça | `/rewind` — restaura arquivos *e* a conversa |
 | Claude ainda está rodando | `Esc`, depois `/rewind` se necessário |
 | Descartar tudo desde o último commit | `git diff --stat` para conferir, depois `git checkout -- .` |
-| Quebrou o `settings.json` | `mv ~/.claude/settings.json{,.broken}` — o Claude Code funciona sem ele |
+| Quebrou o `settings.json` | macOS: `mv ~/.claude/settings.json{,.broken}` · Windows: `Rename-Item "$env:USERPROFILE\.claude\settings.json" settings.json.broken` — o Claude Code funciona sem ele |
 | Quebrou o `~/.claude.json` | Restaure de `~/.claude/backups/` — copie o `.claude.json.backup.*` mais recente |
 | Quebrou o `CLAUDE.md` | Apague as linhas ruins, ou `/init` para regenerar |
 | Claude apagou um arquivo com commit | `git checkout HEAD -- path/to/file` |
-| Nada funciona | `claude doctor`, depois `claude --setting-sources ""` para testar sem configurações |
+| Nada funciona | `claude doctor`, depois `claude --setting-sources ""` para testar sem configurações — o PowerShell 5.1 descarta a string vazia; use 7.3+ |
 | Sem conserto | Reinstale — configurações e histórico sobrevivem |
 
 **Reinstalar:**
+
+**macOS**
 
 ```bash
 curl -fsSL https://claude.ai/install.sh | bash
 ```
 
+**Windows**
+
+```powershell
+irm https://claude.ai/install.ps1 | iex
+```
+
 Encontre um `settings.json` quebrado com:
 
 ```bash
+# macOS
 python3 -m json.tool ~/.claude/settings.json
+
+# Windows
+python -m json.tool "$env:USERPROFILE\.claude\settings.json"
 ```
 
 ---
@@ -134,8 +146,8 @@ Alcançáveis apenas por flag:
 | `bypassPermissions` | Tudo, sem verificações | Apenas containers e VMs |
 
 **Nunca aprovado automaticamente em nenhum modo:** escritas em caminhos protegidos (`.git/`,
-`.claude/`, arquivos rc de shell, `.mcp.json`) e `rm`/`rmdir` em caminhos críticos (home, `/`,
-diretórios de topo, seu diretório de trabalho).
+`.claude/`, arquivos rc de shell como `.zshrc`, `.bashrc` e `$PROFILE`, `.mcp.json`) e
+`rm`/`rmdir` em caminhos críticos (home, `/`, diretórios de topo, seu diretório de trabalho).
 
 > `auto` e `bypassPermissions` **não** funcionam a partir de `.claude/settings.json`. Defina-os em
 > `~/.claude/settings.json`.
@@ -227,8 +239,8 @@ Comece com `claude doctor` (shell) ou `/doctor` (na sessão). Ele relata o que e
 
 | Sintoma | Correção |
 |---|---|
-| `claude: command not found` | Problema de `PATH`. `echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc && source ~/.zshrc` |
-| Arquivo do launcher ausente | Reinstale: `curl -fsSL https://claude.ai/install.sh \| bash` |
+| `claude: command not found` | Problema de `PATH`. macOS: `echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc && source ~/.zshrc` · Windows: `$env:Path += ";$env:USERPROFILE\.local\bin"` — adicione a mesma linha ao `$PROFILE` para persistir |
+| Arquivo do launcher ausente | Reinstale — macOS: `curl -fsSL https://claude.ai/install.sh \| bash` · Windows: `irm https://claude.ai/install.ps1 \| iex` |
 | Loop de login, o navegador não alcança o localhost | O Claude Code imprime uma URL. Faça login, cole a URL de callback completa de volta |
 | Conectores `/mcp` ausentes, ou `session token rejected` | Conectores precisam de login no claude.ai, não de uma API key. Verifique `/status`, depois `/login` |
 
@@ -239,7 +251,7 @@ Comece com `claude doctor` (shell) ou `/doctor` (na sessão). Ele relata o que e
 | Pede permissão para tudo | Você está no Manual. `Shift+Tab` |
 | Modo auto indisponível | Precisa de um modelo recente. Ou `disableAutoMode` está definido |
 | Uma configuração é ignorada | `/status` mostra o que carregou. Confira a precedência e o arquivo certo |
-| `Settings Error` na inicialização | JSON inválido. `python3 -m json.tool <file>` |
+| `Settings Error` na inicialização | JSON inválido. macOS: `python3 -m json.tool <file>` · Windows: `python -m json.tool <file>` |
 | Regra `deny` não bloqueia | As regras casam com o comando como escrito. Verifique `claude --debug` |
 | `bypassPermissions` recusado | Não pode ser habilitado em uma sessão iniciada sem ele |
 
@@ -261,7 +273,7 @@ Comece com `claude doctor` (shell) ou `/doctor` (na sessão). Ele relata o que e
 | `Needs authentication` | `/mcp` → selecione o servidor → Authenticate |
 | Conecta, zero ferramentas | Variável de ambiente faltando — verifique `--env` |
 | `.mcp.json` ignorado | Reinicie a sessão; ele é lido na inicialização |
-| Timeout na inicialização | `MCP_TIMEOUT=60000 claude` |
+| Timeout na inicialização | macOS: `MCP_TIMEOUT=60000 claude` · Windows: `$env:MCP_TIMEOUT=60000; claude` |
 
 ### Sessões
 
@@ -290,13 +302,13 @@ menor para tarefas mecânicas e menos servidores MCP (cada um carrega a lista de
 1. `claude doctor`, e leia tudo
 2. `/status` para confirmar o que carregou
 3. Reproduza em um projeto mínimo
-4. `claude --debug-file /tmp/claude-debug.log` e leia o final
+4. `claude --debug-file /tmp/claude-debug.log` no macOS, `claude --debug-file $env:TEMP\claude-debug.log` no Windows — e leia o final
 5. Busque em <https://code.claude.com/docs>
 6. `/feedback` em uma sessão
 7. Comunidade: <https://www.anthropic.com/discord>
 
-Ao perguntar, inclua a versão (`claude --version`), a versão do macOS, o comando exato, o erro exato
-e as configurações relevantes com segredos ocultados.
+Ao perguntar, inclua a versão (`claude --version`), a versão do seu sistema operacional, o comando
+exato, o erro exato e as configurações relevantes com segredos ocultados.
 
 Mensagens de erro estão indexadas em <https://code.claude.com/docs/en/errors>.
 
@@ -307,10 +319,13 @@ Mensagens de erro estão indexadas em <https://code.claude.com/docs/en/errors>.
 | Limite | Detalhe |
 |---|---|
 | Plano gratuito não basta | Precisa de Pro, Max, Team, Enterprise ou Console |
+| Sandbox | Apenas macOS, Linux e WSL2 — ausente no Windows nativo |
 | `auto` / `bypassPermissions` nas configurações do projeto | Ignorados — defina-os em `~/.claude/settings.json` |
 | Edições no `CLAUDE.md` | Não se aplicam à sessão em execução |
 | Troca de modelo | Invalida o cache de prompt |
 | Regras de permissão | Casam com o comando como escrito |
+| Regras de permissão no Windows | Caminhos são normalizados para POSIX antes de casar — `C:\Users\alice` vira `/c/Users/alice`, então uma regra `deny` precisa de `//c/**/.env` |
+| Hooks que casam apenas `Bash` | Nunca disparam no Windows, onde só existe PowerShell |
 | Servidores MCP | Cada um custa contexto a cada sessão |
 | Compactação | Com perdas |
 

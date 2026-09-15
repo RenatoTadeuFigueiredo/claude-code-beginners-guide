@@ -48,6 +48,8 @@ aspiracionais que ninguém segue.
 
 *O exemplo está em inglês porque esse é o idioma mais comum nesses arquivos, mas ele funciona igual escrito em português.*
 
+*O `make` não vem no Windows por padrão — instale-o ou troque por comandos equivalentes.*
+
 ```markdown
 # Project: acme-api
 
@@ -101,6 +103,9 @@ use `/clear` depois de editar.
 | **Shared project** | `<project>/.claude/settings.json` | Todos — **faça commit deste arquivo** |
 | **Project local** | `<project>/.claude/settings.local.json` | Você, neste projeto — não faça commit |
 
+No Windows, o caminho de usuário é `%USERPROFILE%\.claude\settings.json` — mesmo layout,
+base diferente.
+
 Se a mesma chave aparecer em dois arquivos, a mais alta vence:
 `project local > shared project > user`.
 
@@ -151,6 +156,9 @@ máquina.
 
 > As regras comparam o comando **como escrito**. `git push` e `git -C /path push` são strings
 > diferentes.
+>
+> No Windows, os caminhos são normalizados para a forma POSIX antes de casar — `C:\Users\alice`
+> vira `/c/Users/alice`.
 
 ### Verifique e altere as configurações
 
@@ -160,6 +168,16 @@ máquina.
 
 A linha `Setting sources` lista os arquivos que realmente carregaram. Se o seu não estiver lá, ele não
 carregou — normalmente um caminho errado ou JSON inválido.
+
+Para validar o JSON por conta própria (o macOS traz Python; o Windows não):
+
+```bash
+# macOS
+python3 -m json.tool ~/.claude/settings.json
+
+# Windows
+python -m json.tool "$env:USERPROFILE\.claude\settings.json"
+```
 
 ```text
 /config

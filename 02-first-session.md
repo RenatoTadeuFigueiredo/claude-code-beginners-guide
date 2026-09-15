@@ -22,7 +22,9 @@ claude
 No project yet? Make one:
 
 ```bash
-mkdir -p ~/Projects/hello-claude && cd ~/Projects/hello-claude && git init
+mkdir -p ~/Projects/hello-claude
+cd ~/Projects/hello-claude
+git init
 claude
 ```
 
@@ -86,10 +88,11 @@ claude auto-mode defaults
 ### Two things no mode auto-approves
 
 **Protected paths** — `.git/`, `.claude/`, `.vscode/`, `.idea/`, and files like `.zshrc`,
-`.gitconfig`, `.mcp.json`.
+`.gitconfig`, `.mcp.json`. On Windows, `.zshrc` is `$PROFILE`.
 
 **Critical paths** — `rm` on your home folder, `/`, top-level directories like `/usr`, and your
-working directory. A circuit breaker against a bad glob.
+working directory. A circuit breaker against a bad glob. On Windows the shell has no `rm` — use
+`Remove-Item -Recurse -Force` — and the root is `C:\`.
 
 ---
 
@@ -105,6 +108,13 @@ Read what it wrote (`cat hello.py`), then:
 
 ```text
 run hello.py
+```
+
+The command differs by platform:
+
+```bash
+python3 hello.py   # macOS
+python hello.py    # Windows
 ```
 
 ---
@@ -135,7 +145,8 @@ Nothing is lost — you redirect and continue.
 Git makes everything reversible and reviewable.
 
 ```bash
-git add -A && git commit -m "checkpoint before Claude works"
+git add -A
+git commit -m "checkpoint before Claude works"
 ```
 
 Commit before letting Claude do anything substantial. Then `git diff` to review, and

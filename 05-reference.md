@@ -15,23 +15,35 @@ Almost nothing you do with Claude Code is permanent.
 | Claude made a mess | `/rewind` — restores files *and* conversation |
 | Claude is still running | `Esc`, then `/rewind` if needed |
 | Discard everything since your last commit | `git diff --stat` to check, then `git checkout -- .` |
-| Broke `settings.json` | `mv ~/.claude/settings.json{,.broken}` — Claude Code works without it |
+| Broke `settings.json` | macOS: `mv ~/.claude/settings.json{,.broken}` · Windows: `Rename-Item "$env:USERPROFILE\.claude\settings.json" settings.json.broken` — Claude Code works without it |
 | Broke `~/.claude.json` | Restore from `~/.claude/backups/` — copy the newest `.claude.json.backup.*` |
 | Broke `CLAUDE.md` | Delete the bad lines, or `/init` to regenerate |
 | Claude deleted a committed file | `git checkout HEAD -- path/to/file` |
-| Nothing works | `claude doctor`, then `claude --setting-sources ""` to test without settings |
+| Nothing works | `claude doctor`, then `claude --setting-sources ""` to test without settings — PowerShell 5.1 drops the empty string; use 7.3+ |
 | Beyond repair | Reinstall — settings and history survive |
 
 **Reinstall:**
+
+**macOS**
 
 ```bash
 curl -fsSL https://claude.ai/install.sh | bash
 ```
 
+**Windows**
+
+```powershell
+irm https://claude.ai/install.ps1 | iex
+```
+
 Find a broken `settings.json` with:
 
 ```bash
+# macOS
 python3 -m json.tool ~/.claude/settings.json
+
+# Windows
+python -m json.tool "$env:USERPROFILE\.claude\settings.json"
 ```
 
 ---
@@ -134,8 +146,8 @@ Reachable only by flag:
 | `bypassPermissions` | Everything, no checks | Containers and VMs only |
 
 **Never auto-approved in any mode:** writes to protected paths (`.git/`, `.claude/`, shell rc
-files, `.mcp.json`) and `rm`/`rmdir` on critical paths (home, `/`, top-level dirs, your working
-directory).
+files such as `.zshrc`, `.bashrc`, and `$PROFILE`, `.mcp.json`) and `rm`/`rmdir` on critical paths
+(home, `/`, top-level dirs, your working directory).
 
 > `auto` and `bypassPermissions` do **not** work from `.claude/settings.json`. Set them in
 > `~/.claude/settings.json`.
@@ -227,8 +239,8 @@ Start with `claude doctor` (shell) or `/doctor` (in-session). It reports what is
 
 | Symptom | Fix |
 |---|---|
-| `claude: command not found` | `PATH` problem. `echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc && source ~/.zshrc` |
-| Launcher file missing | Reinstall: `curl -fsSL https://claude.ai/install.sh \| bash` |
+| `claude: command not found` | `PATH` problem. macOS: `echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc && source ~/.zshrc` · Windows: `$env:Path += ";$env:USERPROFILE\.local\bin"` — add the same line to `$PROFILE` to persist |
+| Launcher file missing | Reinstall — macOS: `curl -fsSL https://claude.ai/install.sh \| bash` · Windows: `irm https://claude.ai/install.ps1 \| iex` |
 | Login loop, browser cannot reach localhost | Claude Code prints a URL. Sign in, paste the full callback URL back |
 | `/mcp` connectors missing, or "session token rejected" | Connectors need a claude.ai login, not an API key. Check `/status`, then `/login` |
 
@@ -239,7 +251,7 @@ Start with `claude doctor` (shell) or `/doctor` (in-session). It reports what is
 | Asks for everything | You are in Manual. `Shift+Tab` |
 | Auto mode unavailable | Needs a recent model. Or `disableAutoMode` is set |
 | A setting is ignored | `/status` shows what loaded. Check precedence and the right file |
-| `Settings Error` at startup | Invalid JSON. `python3 -m json.tool <file>` |
+| `Settings Error` at startup | Invalid JSON. macOS: `python3 -m json.tool <file>` · Windows: `python -m json.tool <file>` |
 | `deny` rule not blocking | Rules match the command as written. Check `claude --debug` |
 | `bypassPermissions` refused | Cannot be enabled in a session started without it |
 
@@ -261,7 +273,7 @@ Start with `claude doctor` (shell) or `/doctor` (in-session). It reports what is
 | `Needs authentication` | `/mcp` → select server → Authenticate |
 | Connects, zero tools | Missing environment variable — check `--env` |
 | `.mcp.json` ignored | Restart the session; it is read at startup |
-| Startup timeout | `MCP_TIMEOUT=60000 claude` |
+| Startup timeout | macOS: `MCP_TIMEOUT=60000 claude` · Windows: `$env:MCP_TIMEOUT=60000; claude` |
 
 ### Sessions
 
@@ -290,12 +302,12 @@ Reduce it with `/clear` between tasks, a short `CLAUDE.md`, Sonnet for routine w
 1. `claude doctor`, and read all of it
 2. `/status` to confirm what loaded
 3. Reproduce in a minimal project
-4. `claude --debug-file /tmp/claude-debug.log` and read the tail
+4. `claude --debug-file /tmp/claude-debug.log` on macOS, `claude --debug-file $env:TEMP\claude-debug.log` on Windows — and read the tail
 5. Search <https://code.claude.com/docs>
 6. `/feedback` in a session
 7. Community: <https://www.anthropic.com/discord>
 
-When asking, include the version (`claude --version`), macOS version, the exact command, the exact
+When asking, include the version (`claude --version`), your OS version, the exact command, the exact
 error, and the relevant settings with secrets redacted.
 
 Error messages are indexed at <https://code.claude.com/docs/en/errors>.
@@ -307,10 +319,13 @@ Error messages are indexed at <https://code.claude.com/docs/en/errors>.
 | Limit | Detail |
 |---|---|
 | Free plan is not enough | Needs Pro, Max, Team, Enterprise, or Console |
+| Sandbox | macOS, Linux, and WSL2 only — absent on native Windows |
 | `auto` / `bypassPermissions` in project settings | Ignored — set them in `~/.claude/settings.json` |
 | `CLAUDE.md` edits | Do not apply to the running session |
 | Model switch | Invalidates the prompt cache |
 | Permission rules | Match the command as written |
+| Permission rules on Windows | Paths are normalised to POSIX before matching — `C:\Users\alice` becomes `/c/Users/alice`, so a `deny` rule needs `//c/**/.env` |
+| Hooks matching only `Bash` | Never fire on Windows, where only PowerShell exists |
 | MCP servers | Each costs context every session |
 | Compaction | Lossy |
 

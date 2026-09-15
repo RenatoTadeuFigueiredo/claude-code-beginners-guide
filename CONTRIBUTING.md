@@ -16,9 +16,12 @@ aligned with the official documentation is worth more than new content.
 ## What to avoid
 
 - **Adding options.** Where two ways exist, the guide picks one. A pull request that adds "or you
-  could also…" needs a reason.
+  could also…" needs a reason. Exception: **platform is not a choice, it is data** — the reader does
+  not compare alternatives, they know where they are. Variants labelled by platform are allowed, and
+  only those.
 - **Restating the official docs.** Link instead of duplicating reference material.
-- **Longer prose.** The whole guide is intentionally under ~1,500 lines.
+- **Longer prose.** The whole guide is intentionally under ~1,750 lines. The extra room over the
+  original 1,500 is for platform variants, nothing else.
 
 ## Style
 
@@ -28,6 +31,18 @@ aligned with the official documentation is worth more than new content.
   file contents.
 - Anything skippable goes in a blockquote starting with `**Optional**.`
 - No emoji.
+
+### Platforms
+
+- **Before labelling, try to avoid the divergence.** One command per line, never `&&` — chaining
+  is the single most common reason a block needs two versions. Split it and the block is shared.
+- Command that works on both: one ```bash fence, no label.
+- Command that diverges and the reader will paste it: two labelled blocks — `**macOS**` above a bash
+  fence, `**Windows**` above a ```powershell fence.
+- Command that diverges but is illustrative: one fence with `# macOS` and `# Windows` comments; in a
+  table, both forms in the same cell.
+- Neutral prose: "on your machine", not "on your Mac".
+- Never translate a command, flag, path, or JSON key.
 
 ## Before opening a pull request
 
@@ -41,6 +56,7 @@ python3 - <<'PY'
 from pathlib import Path
 import re
 FENCE = chr(96) * 3          # three backticks, without quoting them literally
+# ```powershell fences are counted here too; bash -n skips them on purpose — they are not bash.
 bad = []
 for f in sorted(Path('.').rglob('*.md')):
     t = f.read_text()
@@ -59,6 +75,7 @@ python3 - <<'PY'
 from pathlib import Path
 import re, subprocess
 FENCE = chr(96) * 3
+# ```powershell fences never match the pattern below, on purpose — they are not bash.
 bad = 0
 for f in sorted(Path('.').rglob('*.md')):
     for m in re.finditer(FENCE + r'bash\n(.*?)' + FENCE, f.read_text(), re.S):

@@ -157,7 +157,7 @@ banco de dados, um navegador. Um **servidor** MCP fornece as ferramentas; o Clau
 Duas palavras que você precisa:
 
 - **Escopo** — `local` (você, esta pasta), `project` (todos que clonarem), `user` (você, em todo lugar).
-- **Transporte** — `http` para um serviço hospedado, `stdio` para um programa no seu Mac.
+- **Transporte** — `http` para um serviço hospedado, `stdio` para um programa na sua máquina.
 
 ## Prática: um servidor sem conta
 
@@ -192,10 +192,25 @@ Sem projeto no Google Cloud, sem credenciais para gerenciar.
 Pule isto a menos que você queira especificamente seu próprio projeto no Google Cloud em vez do
 conector gerenciado.
 
-1. `brew install node`
+1. Instale o Node:
+
+**macOS**
+
+```bash
+brew install node
+```
+
+**Windows**
+
+```powershell
+winget install OpenJS.NodeJS
+```
+
 2. No [Google Cloud Console](https://console.cloud.google.com/), ative as APIs do Drive, Docs,
    Sheets, Slides e Calendar, depois crie um cliente OAuth do tipo **Desktop app**.
-3. Salve o JSON baixado como `~/.config/google-drive-mcp/gcp-oauth.keys.json`.
+3. Salve o JSON baixado como `~/.config/google-drive-mcp/gcp-oauth.keys.json`. No Windows esse
+   caminho não existe por padrão — salve como `%APPDATA%\google-drive-mcp\gcp-oauth.keys.json` e use
+   esse caminho no passo 5.
 4. Autorize uma vez:
 
 ```bash
@@ -204,15 +219,26 @@ npx -y @piotr-agier/google-drive-mcp auth
 
 5. Registre o servidor:
 
+**macOS**
+
 ```bash
 claude mcp add --scope user \
   --env GOOGLE_DRIVE_OAUTH_CREDENTIALS="$HOME/.config/google-drive-mcp/gcp-oauth.keys.json" \
   google-drive -- npx -y @piotr-agier/google-drive-mcp
 ```
 
+**Windows**
+
+```powershell
+claude mcp add --scope user `
+  --env GOOGLE_DRIVE_OAUTH_CREDENTIALS="$env:APPDATA\google-drive-mcp\gcp-oauth.keys.json" `
+  google-drive -- npx -y @piotr-agier/google-drive-mcp
+```
+
 O `--` separa as opções do próprio Claude Code do comando que ele executa. Tudo depois dele é
 repassado ao servidor sem alteração — sem ele, o Claude Code tenta ler `-y` como se fosse uma flag
-sua.
+sua. Isso vale nos dois shells; só a continuação de linha muda — `\` no bash, crase no fim da linha
+no PowerShell.
 
 ## Gerenciando servidores
 
@@ -226,9 +252,9 @@ Dentro de uma sessão, `/mcp` mostra todos os servidores e permite autenticar ou
 
 ## Segurança, brevemente
 
-Servidores MCP **executam código no seu Mac**, e a saída deles entra no contexto do Claude — então
-um servidor que busca conteúdo web pode carregar uma injeção de prompt. Conecte servidores em que
-você confia. Revise a contagem de ferramentas em `/mcp`: um servidor com 100+ ferramentas é
+Servidores MCP **executam código na sua máquina**, e a saída deles entra no contexto do Claude —
+então um servidor que busca conteúdo web pode carregar uma injeção de prompt. Conecte servidores em
+que você confia. Revise a contagem de ferramentas em `/mcp`: um servidor com 100+ ferramentas é
 conveniente e caro.
 
 ---
@@ -306,6 +332,8 @@ de o modelo decidir rodá-los.
 
 Este notifica você quando o Claude precisa de entrada. Em `~/.claude/settings.json`:
 
+**macOS**
+
 ```json
 {
   "hooks": {
@@ -320,7 +348,29 @@ Este notifica você quando o Claude precisa de entrada. Em `~/.claude/settings.j
 }
 ```
 
+**Windows**
+
+```json
+{
+  "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          { "type": "command", "command": "powershell -NoProfile -Command '[console]::beep(880,300)'" }
+        ]
+      }
+    ]
+  }
+}
+```
+
+O `osascript` não existe no Windows, então o hook do Windows apita. Um toast de verdade precisa do
+módulo opcional `BurntToast`: `Install-Module BurntToast` e
+`New-BurntToastNotification -Text "Claude needs you"` como comando.
+
 E este formata todos os arquivos que o Claude edita:
+
+**macOS**
 
 ```json
 {
@@ -340,9 +390,33 @@ E este formata todos os arquivos que o Claude edita:
 }
 ```
 
-Esse comando longo lê o caminho do arquivo editado da entrada JSON do hook e roda o `prettier` nele.
-Ele usa `python3`, que você já tem, em vez de `jq`, que você teria de instalar. Ele precisa do Node
-da Parte 2 para o `npx`.
+**Windows**
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -Command '$j = [Console]::In.ReadToEnd() | ConvertFrom-Json; npx prettier --write $j.tool_input.file_path'"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Os dois comandos leem o caminho do arquivo editado da entrada JSON do hook e rodam o `prettier`
+nele. O do macOS usa `python3`, que você já tem; o do Windows usa PowerShell, que vem no sistema.
+Nenhum precisa de `jq`, que você teria de instalar. Os dois precisam do Node da Parte 2 para o `npx`.
+
+> No Windows o shell dos hooks é `bash` quando há Git Bash, e PowerShell quando não há. Um hook cujo
+> matcher cita só `Bash` nunca dispara onde só existe PowerShell — em silêncio. Case os dois
+> (`Bash|PowerShell`) quando o hook tiver de rodar dos dois jeitos.
 
 Depure hooks com `/hooks` — um hook que falha em silêncio é o problema mais comum.
 
